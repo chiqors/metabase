@@ -1,0 +1,43 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    container_name: metabase-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: metabase,ducklake_analytics
+      POSTGRES_USER: metabase
+      POSTGRES_PASSWORD: metabase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  metabase:
+    build:
+      context: .
+      dockerfile: metabase.dockerfile
+    container_name: metabase
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_USER: metabase
+      MB_DB_PASS: metabase
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx2g"
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcs-sa.json
+    volumes:
+      # GCS credentials for DuckDB
+      - ./secrets/gcs-sa.json:/secrets/gcs-sa.json:ro
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata: {}
+  rustfs-data: {}
+  rustfs-cold-data: {}
