@@ -23,7 +23,7 @@ if [ -n "$SETUP_TOKEN" ]; then
           "host": "'"$STARROCKS_HOST"'",
           "port": '"$STARROCKS_PORT"',
           "catalog": "'"$STARROCKS_CATALOG"'",
-          "db": "'"$STARROCKS_DATABASE"'",
+          "dbname": "'"$STARROCKS_DATABASE"'",
           "user": "'"$STARROCKS_USER"'",
           "password": "'"$STARROCKS_PASSWORD"'"
         },
@@ -48,7 +48,7 @@ if [ -n "$TOKEN" ]; then
           "host": "'"$STARROCKS_HOST"'",
           "port": '"$STARROCKS_PORT"',
           "catalog": "'"$STARROCKS_CATALOG"'",
-          "db": "'"$STARROCKS_DATABASE"'",
+          "dbname": "'"$STARROCKS_DATABASE"'",
           "user": "'"$STARROCKS_USER"'",
           "password": "'"$STARROCKS_PASSWORD"'"
         },
@@ -56,7 +56,7 @@ if [ -n "$TOKEN" ]; then
         "refingerprint": true
       }' >/dev/null || true
   else
-    SR_DB=$(echo "$DBLIST" | jq -r '.data[] | select(.engine=="starrocks") | .details.db // empty' | head -n1)
+    SR_DB=$(echo "$DBLIST" | jq -r '.data[] | select(.engine=="starrocks") | (.details.dbname // .details.db // .details.database // empty)' | head -n1)
     if [ -z "$SR_DB" ] && [ -n "$STARROCKS_DATABASE" ]; then
       curl -s -X PUT "$MB_URL/api/database/$SR_ID" \
         -H "Content-Type: application/json" \
@@ -68,7 +68,7 @@ if [ -n "$TOKEN" ]; then
             "host": "'"$STARROCKS_HOST"'",
             "port": '"$STARROCKS_PORT"',
             "catalog": "'"$STARROCKS_CATALOG"'",
-            "db": "'"$STARROCKS_DATABASE"'",
+            "dbname": "'"$STARROCKS_DATABASE"'",
             "user": "'"$STARROCKS_USER"'",
             "password": "'"$STARROCKS_PASSWORD"'"
           },
