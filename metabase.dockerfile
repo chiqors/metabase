@@ -11,6 +11,8 @@ RUN groupadd -r metabase && useradd -r -g metabase metabase
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    curl \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 # /home/metabase/plugins will hold the plugins
@@ -19,6 +21,8 @@ RUN mkdir -p /home/metabase/plugins /home/metabase/data && \
     chown -R metabase:metabase /home/metabase
 
 WORKDIR /home/metabase
+COPY metabase-init.sh /metabase-init.sh
+RUN chmod +x /metabase-init.sh
 ADD --chown=metabase:metabase https://downloads.metabase.com/v${METABASE_VERSION}/metabase.jar /home/metabase/
 ADD --chown=metabase:metabase https://github.com/motherduckdb/metabase_duckdb_driver/releases/download/${METABASE_DUCKDB_DRIVER_VERSION}/duckdb.metabase-driver.jar /home/metabase/plugins/
 ADD --chown=metabase:metabase https://github.com/Carbon-Arc/metabase-starrocks-driver/releases/download/v${METABASE_STARROCKS_DRIVER_VERSION}/starrocks.metabase-driver-v${METABASE_STARROCKS_DRIVER_VERSION}.jar /home/metabase/plugins/
@@ -30,6 +34,4 @@ RUN chmod 755 /home/metabase/metabase.jar && \
 
 EXPOSE 3000
 
-USER metabase
-
-CMD ["java", "-jar", "/home/metabase/metabase.jar"]
+CMD ["/metabase-init.sh"]
