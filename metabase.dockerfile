@@ -34,4 +34,6 @@ RUN chmod 755 /home/metabase/metabase.jar && \
 
 EXPOSE 3000
 
+USER metabase
+
 CMD ["/metabase-init.sh"]

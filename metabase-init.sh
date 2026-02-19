@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 MB_URL="http://localhost:3000"
-su -s /bin/sh metabase -c "java -jar /home/metabase/metabase.jar &"
+/opt/java/openjdk/bin/java -jar /home/metabase/metabase.jar &
 PID=""
 STATUS=""
 while [ "$STATUS" != "ok" ]; do
